@@ -3,8 +3,11 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { AuthModule } from './auth/auth.module';
+import { AppRoutingModule } from './app-routing.module';
+
 import { SharedModule } from  './shared';
+import { AuthModule } from './auth/auth.module';
+import { HomeModule } from './home/home.module';
 
 @NgModule({
   declarations: [
@@ -12,8 +15,10 @@ import { SharedModule } from  './shared';
   ],
   imports: [
     BrowserModule,
+    SharedModule,
+    HomeModule,
     AuthModule,
-    SharedModule
+    AppRoutingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
