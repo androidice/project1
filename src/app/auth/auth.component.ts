@@ -6,6 +6,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router} from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 
+import { UserService } from '../core';
+
+
 @Component({
     selector: 'app-auth-page',
     templateUrl: './auth.component.html'
@@ -19,7 +22,8 @@ export class AuthComponent implements OnInit {
     
     constructor(
         private route: ActivatedRoute,
-        private fb: FormBuilder
+        private fb: FormBuilder,
+        private userService: UserService
     ) {
         this.authForm = this.fb.group({
             'email': ['', Validators.required],
@@ -42,5 +46,14 @@ export class AuthComponent implements OnInit {
         const credentials = this.authForm.value;
         console.log('credentials', credentials);
         console.log('submitting form');
+        this.userService.attemptAuth(this.authType, credentials)
+        .subscribe(
+            (data) => {
+                console.log('after submit', data);
+            },
+            (error) => {
+                console.log('error', error);
+            }
+        );
     }
 }
