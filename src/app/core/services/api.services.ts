@@ -16,19 +16,33 @@ export class ApiService {
     }
 
     private formatError(error: any){
-        console.log('error', error);
-        return new ErrorObservable(error);
+        return new ErrorObservable(error.error);
+    }
+
+    get(path: string, params: HttpParams = new HttpParams()): Observable<any>
+    {
+        return this.http.get(`${environment.api_url}${path}`, { params })
+            .pipe(
+                catchError(this.formatError)
+            )
     }
 
     post(path: string, body: Object = {}): Observable<any>
     {
         var url =  `${environment.api_url}${path}`;
         var data = JSON.stringify(body);
-        console.log('url',url);
-        console.log('data',data);
         return this.http.post(url, data)
         .pipe(
             catchError(this.formatError) /*handle error on http */
         )
+    }
+
+    put(path: string, body: Object = {}): Observable<any>
+    {
+        return this.http.put(`${environment.api_url}${path}`,
+                                JSON.stringify(body))
+                                .pipe(
+                                    catchError(this.formatError)
+                                );
     }
 }

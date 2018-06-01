@@ -8,10 +8,19 @@ import { ReplaySubject } from 'rxjs/ReplaySubject'
 import { JwtService } from './jwt.services';
 import { ApiService } from './api.services';
 
+import { User } from '../models';
+
 import { map, catchError } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators/distinctUntilChanged';
 
 @Injectable()
 export class UserService {
+    private currentUserSubject = new BehaviorSubject<User>({} as User);
+    public currentUser = this.currentUserSubject.asObservable().pipe(distinctUntilChanged());
+
+    private isAuthenticatedSubject = new ReplaySubject<boolean>(1);
+    public isAuthenticated = this.isAuthenticatedSubject.asObservable();
+     
     constructor(
         private apiService: ApiService,
         private http: HttpClient,
@@ -19,8 +28,31 @@ export class UserService {
     )
     {}
 
+    populate(){
+        if(this.jwtService.getToken()){
+            this.apiService.get('/user')
+            .subscribe(
+                data=> this.setAuth(data.user),
+                err => this.purgeAuth()
+            );
+        }else{
+            this.purgeAuth();
+        }
+    }
 
-    attemptAuth(type, credentials){
+    setAuth(user: User){
+        this.jwtService.saveToken(user.token);
+        this.currentUserSubject.next(user);
+        this.isAuthenticatedSubject.next(true);
+    }
+
+    purgeAuth(){
+        this.jwtService.destroyToken();
+        this.currentUserSubject.next({} as User);
+        this.isAuthenticatedSubject.next(false);
+    }
+
+    attemptAuth(type, credentials): Observable<User>{
         const route = (type === "login")? '/login': '';
         return this.apiService.post(`/users${route}`, {user: credentials})
         .pipe(
@@ -29,6 +61,20 @@ export class UserService {
                 return data;
             })
         )
-       
+    }
+
+    getCurrentUser(): User {
+        return this.currentUserSubject.value;
+    }
+
+    update(user): Observable<User> {
+        return this.apiService.put('/user', {user})
+        .pipe(
+            map(data => {
+                this.currentUserSubject.next(data.user);
+                return  data.user;
+            })
+        );
+
     }
 }

@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router} from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 
-import { UserService } from '../core';
+import {Errors, UserService } from '../core';
 
 
 @Component({
@@ -17,11 +17,13 @@ import { UserService } from '../core';
 export class AuthComponent implements OnInit {
     authType: String = '';
     title: String = '';
+    errors: Errors = {errors: {}};
     authForm : FormGroup;
     isSubmitting = false;
     
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
         private fb: FormBuilder,
         private userService: UserService
     ) {
@@ -44,15 +46,13 @@ export class AuthComponent implements OnInit {
 
     submitForm(){
         const credentials = this.authForm.value;
-        console.log('credentials', credentials);
-        console.log('submitting form');
         this.userService.attemptAuth(this.authType, credentials)
         .subscribe(
             (data) => {
-                console.log('after submit', data);
+              this.router.navigateByUrl('/'); 
             },
             (error) => {
-                console.log('error', error);
+                this.errors = error;
             }
         );
     }
