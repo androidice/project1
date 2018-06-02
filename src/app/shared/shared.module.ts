@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http'
 import { RouterModule } from '@angular/router';
 
+import { ArticleListComponent } from './article-helpers'
+
 @NgModule({
     imports: [
         CommonModule,
@@ -12,13 +14,16 @@ import { RouterModule } from '@angular/router';
         ReactiveFormsModule,
         RouterModule
     ],
-    declarations: [],
+    declarations: [
+        ArticleListComponent
+    ],
     exports: [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
         RouterModule,
-        HttpClientModule
+        HttpClientModule,
+        ArticleListComponent
     ]
 })
 export class SharedModule {}
